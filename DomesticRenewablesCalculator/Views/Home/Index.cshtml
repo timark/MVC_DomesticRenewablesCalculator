@@ -264,9 +264,9 @@
                         <dt class="col-sm-7">Simple payback</dt>
                         <dd class="col-sm-5 text-end">
                             @(result.SimplePaybackYears.HasValue
-                                ? $"{result.SimplePaybackYears.Value:0.0} years"
-                                : "—")
-                        </dd>
+                                                    ? $"{result.SimplePaybackYears.Value:0.0} years"
+                                                    : "—")
+                    </dd>
 
                         <dt class="col-sm-7">Net present value (@Model.AnalysisOptions.DiscountRatePercentage.ToString("0.#")% over @Model.AnalysisOptions.AnalysisYears years)</dt>
                         <dd class="col-sm-5 text-end">@result.NetPresentValue.ToString("C")</dd>
