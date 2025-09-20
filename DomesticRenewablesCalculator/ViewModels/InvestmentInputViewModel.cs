@@ -22,23 +22,23 @@ public class InvestmentInputViewModel
 
 public class TariffInputModel
 {
-    [Display(Name = "Peak rate ($/kWh)")]
+    [Display(Name = "Peak rate (£/kWh)")]
     [Range(0, double.MaxValue)]
     public double PeakRate { get; set; } = 0.32d;
 
-    [Display(Name = "Shoulder rate ($/kWh)")]
+    [Display(Name = "Shoulder rate (£/kWh)")]
     [Range(0, double.MaxValue)]
     public double ShoulderRate { get; set; } = 0.24d;
 
-    [Display(Name = "Off-peak rate ($/kWh)")]
+    [Display(Name = "Off-peak rate (£/kWh)")]
     [Range(0, double.MaxValue)]
     public double OffPeakRate { get; set; } = 0.18d;
 
-    [Display(Name = "Feed-in tariff ($/kWh)")]
+    [Display(Name = "Feed-in tariff (£/kWh)")]
     [Range(0, double.MaxValue)]
     public double FeedInTariff { get; set; } = 0.08d;
 
-    [Display(Name = "Daily supply charge ($)")]
+    [Display(Name = "Daily supply charge (£)")]
     [Range(0, double.MaxValue)]
     public double DailySupplyCharge { get; set; } = 0.9d;
 }
@@ -79,11 +79,11 @@ public class SolarInputModel
     [Range(0, 24)]
     public double GenerationPerKwPerDay { get; set; } = 4.2d;
 
-    [Display(Name = "Upfront cost ($)")]
+    [Display(Name = "Upfront cost (£)")]
     [Range(0, double.MaxValue)]
     public double InstallCost { get; set; } = 6500d;
 
-    [Display(Name = "Annual maintenance cost ($)")]
+    [Display(Name = "Annual maintenance cost (£)")]
     [Range(0, double.MaxValue)]
     public double MaintenancePerYear { get; set; } = 120d;
 
@@ -113,11 +113,11 @@ public class BatteryInputModel
     [Range(0, 100)]
     public double ChargeFromOffPeakPercentage { get; set; } = 20d;
 
-    [Display(Name = "Upfront cost ($)")]
+    [Display(Name = "Upfront cost (£)")]
     [Range(0, double.MaxValue)]
     public double InstallCost { get; set; } = 11000d;
 
-    [Display(Name = "Annual maintenance cost ($)")]
+    [Display(Name = "Annual maintenance cost (£)")]
     [Range(0, double.MaxValue)]
     public double MaintenancePerYear { get; set; } = 150d;
 
@@ -143,7 +143,7 @@ public class HotWaterInputModel
     [Range(0, double.MaxValue)]
     public double InstallCost { get; set; } = 4000d;
 
-    [Display(Name = "Annual maintenance cost ($)")]
+    [Display(Name = "Annual maintenance cost (£)")]
     [Range(0, double.MaxValue)]
     public double MaintenancePerYear { get; set; } = 80d;
 
