@@ -1,0 +1,354 @@
+@model InvestmentInputViewModel
+@{
+    ViewData["Title"] = "Domestic Renewables ROI";
+}
+
+<h1 class="mb-4">Domestic Renewables ROI Calculator</h1>
+<p class="text-muted">Model how solar PV, battery storage, and hot water load shifting impact annual energy costs and long-term return on investment while accounting for tariff structures and occupant usage patterns.</p>
+
+@if (ViewData["UsageNormalisationMessage"] is string usageMessage)
+{
+    <div class="alert alert-warning">@usageMessage</div>
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Index" method="post" class="row g-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Tariff assumptions</div>
+            <div class="card-body row g-3">
+                <div class="col-md-4">
+                    <label asp-for="Tariff.PeakRate" class="form-label"></label>
+                    <input asp-for="Tariff.PeakRate" class="form-control" />
+                    <span asp-validation-for="Tariff.PeakRate" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Tariff.ShoulderRate" class="form-label"></label>
+                    <input asp-for="Tariff.ShoulderRate" class="form-control" />
+                    <span asp-validation-for="Tariff.ShoulderRate" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Tariff.OffPeakRate" class="form-label"></label>
+                    <input asp-for="Tariff.OffPeakRate" class="form-control" />
+                    <span asp-validation-for="Tariff.OffPeakRate" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Tariff.FeedInTariff" class="form-label"></label>
+                    <input asp-for="Tariff.FeedInTariff" class="form-control" />
+                    <span asp-validation-for="Tariff.FeedInTariff" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Tariff.DailySupplyCharge" class="form-label"></label>
+                    <input asp-for="Tariff.DailySupplyCharge" class="form-control" />
+                    <span asp-validation-for="Tariff.DailySupplyCharge" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Occupant usage pattern</div>
+            <div class="card-body row g-3">
+                <div class="col-md-4">
+                    <label asp-for="UsagePattern.AverageDailyConsumptionKWh" class="form-label"></label>
+                    <input asp-for="UsagePattern.AverageDailyConsumptionKWh" class="form-control" />
+                    <span asp-validation-for="UsagePattern.AverageDailyConsumptionKWh" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="UsagePattern.PeakUsagePercentage" class="form-label"></label>
+                    <input asp-for="UsagePattern.PeakUsagePercentage" class="form-control" />
+                    <span asp-validation-for="UsagePattern.PeakUsagePercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="UsagePattern.ShoulderUsagePercentage" class="form-label"></label>
+                    <input asp-for="UsagePattern.ShoulderUsagePercentage" class="form-control" />
+                    <span asp-validation-for="UsagePattern.ShoulderUsagePercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="UsagePattern.OffPeakUsagePercentage" class="form-label"></label>
+                    <input asp-for="UsagePattern.OffPeakUsagePercentage" class="form-control" />
+                    <span asp-validation-for="UsagePattern.OffPeakUsagePercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="UsagePattern.DaytimeUsagePercentage" class="form-label"></label>
+                    <input asp-for="UsagePattern.DaytimeUsagePercentage" class="form-control" />
+                    <span asp-validation-for="UsagePattern.DaytimeUsagePercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-text">Percentages describe how consumption is split across tariff periods. Daytime usage is used to estimate on-site solar self-consumption.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Solar PV</div>
+            <div class="card-body row g-3 align-items-end">
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="Solar.IsEnabled" class="form-check-input" />
+                        <label asp-for="Solar.IsEnabled" class="form-check-label"></label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Solar.SystemSizeKw" class="form-label"></label>
+                    <input asp-for="Solar.SystemSizeKw" class="form-control" />
+                    <span asp-validation-for="Solar.SystemSizeKw" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Solar.GenerationPerKwPerDay" class="form-label"></label>
+                    <input asp-for="Solar.GenerationPerKwPerDay" class="form-control" />
+                    <span asp-validation-for="Solar.GenerationPerKwPerDay" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Solar.InstallCost" class="form-label"></label>
+                    <input asp-for="Solar.InstallCost" class="form-control" />
+                    <span asp-validation-for="Solar.InstallCost" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Solar.MaintenancePerYear" class="form-label"></label>
+                    <input asp-for="Solar.MaintenancePerYear" class="form-control" />
+                    <span asp-validation-for="Solar.MaintenancePerYear" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Solar.LifetimeYears" class="form-label"></label>
+                    <input asp-for="Solar.LifetimeYears" class="form-control" />
+                    <span asp-validation-for="Solar.LifetimeYears" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Battery storage</div>
+            <div class="card-body row g-3 align-items-end">
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="Battery.IsEnabled" class="form-check-input" />
+                        <label asp-for="Battery.IsEnabled" class="form-check-label"></label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Battery.CapacityKWh" class="form-label"></label>
+                    <input asp-for="Battery.CapacityKWh" class="form-control" />
+                    <span asp-validation-for="Battery.CapacityKWh" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Battery.RoundTripEfficiencyPercentage" class="form-label"></label>
+                    <input asp-for="Battery.RoundTripEfficiencyPercentage" class="form-control" />
+                    <span asp-validation-for="Battery.RoundTripEfficiencyPercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Battery.DepthOfDischargePercentage" class="form-label"></label>
+                    <input asp-for="Battery.DepthOfDischargePercentage" class="form-control" />
+                    <span asp-validation-for="Battery.DepthOfDischargePercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Battery.ChargeFromOffPeakPercentage" class="form-label"></label>
+                    <input asp-for="Battery.ChargeFromOffPeakPercentage" class="form-control" />
+                    <span asp-validation-for="Battery.ChargeFromOffPeakPercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Battery.InstallCost" class="form-label"></label>
+                    <input asp-for="Battery.InstallCost" class="form-control" />
+                    <span asp-validation-for="Battery.InstallCost" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Battery.MaintenancePerYear" class="form-label"></label>
+                    <input asp-for="Battery.MaintenancePerYear" class="form-control" />
+                    <span asp-validation-for="Battery.MaintenancePerYear" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Battery.LifetimeYears" class="form-label"></label>
+                    <input asp-for="Battery.LifetimeYears" class="form-control" />
+                    <span asp-validation-for="Battery.LifetimeYears" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Hot water storage</div>
+            <div class="card-body row g-3 align-items-end">
+                <div class="col-md-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="HotWater.IsEnabled" class="form-check-input" />
+                        <label asp-for="HotWater.IsEnabled" class="form-check-label"></label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="HotWater.ShiftableLoadKWhPerDay" class="form-label"></label>
+                    <input asp-for="HotWater.ShiftableLoadKWhPerDay" class="form-control" />
+                    <span asp-validation-for="HotWater.ShiftableLoadKWhPerDay" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="HotWater.StorageEfficiencyPercentage" class="form-label"></label>
+                    <input asp-for="HotWater.StorageEfficiencyPercentage" class="form-control" />
+                    <span asp-validation-for="HotWater.StorageEfficiencyPercentage" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="HotWater.InstallCost" class="form-label"></label>
+                    <input asp-for="HotWater.InstallCost" class="form-control" />
+                    <span asp-validation-for="HotWater.InstallCost" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="HotWater.MaintenancePerYear" class="form-label"></label>
+                    <input asp-for="HotWater.MaintenancePerYear" class="form-control" />
+                    <span asp-validation-for="HotWater.MaintenancePerYear" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="HotWater.LifetimeYears" class="form-label"></label>
+                    <input asp-for="HotWater.LifetimeYears" class="form-control" />
+                    <span asp-validation-for="HotWater.LifetimeYears" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Financial analysis</div>
+            <div class="card-body row g-3">
+                <div class="col-md-4">
+                    <label asp-for="AnalysisOptions.AnalysisYears" class="form-label"></label>
+                    <input asp-for="AnalysisOptions.AnalysisYears" class="form-control" />
+                    <span asp-validation-for="AnalysisOptions.AnalysisYears" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="AnalysisOptions.DiscountRatePercentage" class="form-label"></label>
+                    <input asp-for="AnalysisOptions.DiscountRatePercentage" class="form-control" />
+                    <span asp-validation-for="AnalysisOptions.DiscountRatePercentage" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 text-end">
+        <button type="submit" class="btn btn-primary btn-lg">Calculate ROI</button>
+    </div>
+</form>
+
+@if (Model.Result is { } result)
+{
+    <hr class="my-5" />
+    <h2>Investment results</h2>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header fw-semibold">Financial summary</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-7">Baseline annual cost</dt>
+                        <dd class="col-sm-5 text-end">@result.BaselineAnnualCost.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Annual cost with renewables</dt>
+                        <dd class="col-sm-5 text-end">@result.AnnualOperatingCostWithSystem.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Annual savings</dt>
+                        <dd class="col-sm-5 text-end">@result.AnnualNetSavings.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Feed-in revenue</dt>
+                        <dd class="col-sm-5 text-end">@result.AnnualFeedInRevenue.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Maintenance cost</dt>
+                        <dd class="col-sm-5 text-end">@result.AnnualMaintenanceCost.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Upfront investment</dt>
+                        <dd class="col-sm-5 text-end">@result.TotalUpfrontCost.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Simple payback</dt>
+                        <dd class="col-sm-5 text-end">
+                            @(result.SimplePaybackYears.HasValue
+                                ? $"{result.SimplePaybackYears.Value:0.0} years"
+                                : "—")
+                        </dd>
+
+                        <dt class="col-sm-7">Net present value (@Model.AnalysisOptions.DiscountRatePercentage.ToString("0.#")% over @Model.AnalysisOptions.AnalysisYears years)</dt>
+                        <dd class="col-sm-5 text-end">@result.NetPresentValue.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Total net savings over period</dt>
+                        <dd class="col-sm-5 text-end">@result.TotalNetSavingsOverPeriod.ToString("C")</dd>
+
+                        <dt class="col-sm-7">Simple ROI</dt>
+                        <dd class="col-sm-5 text-end">@result.SimpleReturnOnInvestment.ToString("P1")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header fw-semibold">Energy balance</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-7">Annual consumption baseline</dt>
+                        <dd class="col-sm-5 text-end">@result.BaselineAnnualConsumptionKWh.ToString("N0") kWh</dd>
+
+                        <dt class="col-sm-7">Solar generation</dt>
+                        <dd class="col-sm-5 text-end">@result.SolarGenerationKWh.ToString("N0") kWh</dd>
+
+                        <dt class="col-sm-7">Solar self-consumption</dt>
+                        <dd class="col-sm-5 text-end">@result.SolarSelfConsumptionKWh.ToString("N0") kWh</dd>
+
+                        <dt class="col-sm-7">Solar exported</dt>
+                        <dd class="col-sm-5 text-end">@result.SolarExportKWh.ToString("N0") kWh</dd>
+
+                        <dt class="col-sm-7">Battery charged from solar</dt>
+                        <dd class="col-sm-5 text-end">@result.BatterySolarChargeKWh.ToString("N0") kWh</dd>
+
+                        <dt class="col-sm-7">Battery charged off-peak</dt>
+                        <dd class="col-sm-5 text-end">@result.BatteryOffPeakChargeKWh.ToString("N0") kWh</dd>
+
+                        <dt class="col-sm-7">Battery discharge used</dt>
+                        <dd class="col-sm-5 text-end">@result.BatteryDischargeKWh.ToString("N0") kWh</dd>
+
+                        <dt class="col-sm-7">Hot water load shifted</dt>
+                        <dd class="col-sm-5 text-end">@result.HotWaterShiftedLoadKWh.ToString("N0") kWh</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">Grid consumption by tariff period</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-striped table-bordered align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tariff period</th>
+                                <th>Baseline consumption (kWh)</th>
+                                <th>With renewables (kWh)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Peak</td>
+                                <td>@result.BaselinePeakConsumptionKWh.ToString("N0")</td>
+                                <td>@result.GridPeakConsumptionWithSystemKWh.ToString("N0")</td>
+                            </tr>
+                            <tr>
+                                <td>Shoulder</td>
+                                <td>@result.BaselineShoulderConsumptionKWh.ToString("N0")</td>
+                                <td>@result.GridShoulderConsumptionWithSystemKWh.ToString("N0")</td>
+                            </tr>
+                            <tr>
+                                <td>Off-peak</td>
+                                <td>@result.BaselineOffPeakConsumptionKWh.ToString("N0")</td>
+                                <td>@result.GridOffPeakConsumptionWithSystemKWh.ToString("N0")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}
